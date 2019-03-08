@@ -1,0 +1,2 @@
+All code was written and tested in Python 3.
+network2.py was created by Michael Nielsen.

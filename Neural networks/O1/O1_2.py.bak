@@ -1,0 +1,79 @@
+import numpy as np;
+import matplotlib.pyplot as plt;
+import sklearn.metrics as skm;
+#import sklearn.metrics.pairwise.pairwise.distances as skd;
+
+NUM_TEST=1000;
+NUM_TRAIN=1707;
+
+test_in=np.genfromtxt("test_in.csv", delimiter=',');
+test_out=np.genfromtxt("test_out.csv", delimiter=',');
+train_in=np.genfromtxt("train_in.csv", delimiter=',');
+train_out=np.genfromtxt("train_out.csv", delimiter=',');
+
+def euclidian_dist(x, y):
+	return np.sqrt(sum((x-y)**2));
+
+def get_clouds(data_in, data_out):
+	clouds=[[]]*10;
+	for i in range(0, NUM_TRAIN):
+		digit=data_out[i];
+		digit_index=np.int(digit);
+		if clouds[digit_index]==[]:
+			clouds[digit_index]=data_in[i];
+		else:
+			clouds[digit_index]=np.vstack([clouds[digit_index], data_in[i]]);
+	return clouds;
+	
+def get_centres(clouds):
+	centres=np.empty([10, 256]);	
+	for i in range(0, 10):
+		centres[i]=np.mean(clouds[i], axis=0);	
+	return centres;
+
+"""def classify(data_in, centres):
+	classes=np.empty(data_in.shape[0]);
+	for i in range(0, data_in.shape[0]):
+		mindist=np.inf;
+		image_class=-1;
+		for j in range(0, 10):
+			dist=euclidian_dist(data_in[i], centres[j]);
+			if dist<mindist:
+				mindist=dist;
+				image_class=j;
+		classes[i]=image_class;
+	return classes;"""
+	
+def classify_1(data_in, centres, metriek):
+	distances = skm.pairwise.pairwise_distances(data_in, centres, metric = metriek);
+	classes = distances.argmin(axis = 1)
+	return classes
+
+
+train_clouds=get_clouds(train_in, train_out); 
+train_centres=get_centres(train_clouds);
+
+#classification=classify_1(train_in, train_centres, 'euclidean')
+
+
+#cmatrix=skm.confusion_matrix(train_out, classification);
+#norm_cmatrix=cmatrix/np.sum(cmatrix, axis=1)[:, np.newaxis];
+
+test_classification=classify_1(test_in, train_centres, 'euclidean');
+test_cmatrix=skm.confusion_matrix(test_out, test_classification);
+norm_test_cmatrix=test_cmatrix/np.sum(test_cmatrix, axis=1)[:, np.newaxis];
+
+#np.set_printoptions(threshold=numpy.nan)
+np.set_printoptions(precision=3);
+#print(cmatrix);
+#print(norm_cmatrix);
+print(test_cmatrix);
+print(norm_test_cmatrix);
+
+for i in ['euclidean', 'cityblock', 'cosine', 'l1', 'l2', 'manhattan']:
+	print("metric:", i)
+	test_classification=classify_1(test_in, train_centres, i);
+	test_cmatrix=skm.confusion_matrix(test_out, test_classification);
+	norm_test_cmatrix=test_cmatrix/np.sum(test_cmatrix, axis=1)[:, np.newaxis];
+	print(norm_test_cmatrix);
+
