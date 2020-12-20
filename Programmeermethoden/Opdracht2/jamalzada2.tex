@@ -1,0 +1,93 @@
+
+%
+% Stel je wilt het C++-programma iets.cc mooi printen,
+% en wellicht er nog wat begeleidende tekst bij schrijven.
+%
+
+\documentclass{article}
+
+\setlength{\textheight}{25.7cm}
+\setlength{\textwidth}{16cm}
+\setlength{\unitlength}{1mm}
+\setlength{\topskip}{2.5truecm}
+\topmargin 260mm \advance \topmargin -\textheight 
+\divide \topmargin by 2 \advance \topmargin -1in 
+\headheight 0pt \headsep 0pt \leftmargin 210mm \advance
+\leftmargin -\textwidth 
+\divide \leftmargin by 2 \advance \leftmargin -1in 
+\oddsidemargin \leftmargin \evensidemargin \leftmargin
+\parindent=0pt
+
+\frenchspacing
+
+\usepackage[english,dutch]{babel}
+
+\usepackage{listings}
+% Er zijn talloze parameters ...
+\lstset{language=C++, showstringspaces=false, basicstyle=\small,
+  numbers=left, numberstyle=\tiny, numberfirstline=false,
+  stepnumber=1, tabsize=4, 
+  commentstyle=\ttfamily, identifierstyle=\ttfamily,
+  stringstyle=\itshape}
+\usepackage{datetime}
+\newdate{date}{22}{11}{2013}
+\date{\displaydate{date}}
+
+
+\title{CIL}
+\author{Ahmad Jamalzada}
+
+\begin{document}
+
+\selectlanguage{dutch}
+
+\maketitle
+
+\section{Inleiding}
+Deze code is in C++ geschreven door Ahmad Jamalzada 1145657 voor het vak programmeermethoden.
+
+\begin{center}
+\begin{tabular}{l|l}
+\hline
+Week & Tijd Ahmad\\
+\hline
+41 & 10\\
+47 & 25
+\end{tabular}
+\end{center}
+Ik heb er totaal 35 uren aan gewerkt.
+
+\section{Werking}
+Het programma past zal na elke accolade inspringen met een door de gebruiker gekozen tabgrootte. En het verwijdert commentaar. Bijvoorbeeld:
+
+\begin{verbatim*}
+int main(){//Dit is commentaar.
+if (true){
+cout << "Hello world!" << endl;//nog meer commentaar
+return 0;
+}
+}
+\end{verbatim*}
+Zal aangepast worden tot:
+
+\begin{verbatim*}
+int main(){
+    if (true){
+        cout << "Hello world!" << endl;
+    }
+    return 0;
+}
+\end{verbatim*}
+De gebruiker kan kiezen welke file hij wil aanpassen en hoe de output file zal heten.
+
+\section{Opmerkingen}
+De programma gaat ervan uit dat de accolades in paren zijn.
+Als er bijv. meer sluit accolades zijn dan zal het programma negatieve aantal tabs afdrukken. Als er bijv. meer open accolades zijn zal er altijd geprint worden met een bepaalde hoeveelheid tabs.
+\bigskip
+
+\section{Code}
+En dit is het programma:
+
+\lstinputlisting{Jamalzada2.cc}
+
+\end{document}

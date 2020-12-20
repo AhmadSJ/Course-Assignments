@@ -1,0 +1,75 @@
+\documentclass[11pt]{article}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{microtype}
+\usepackage[english]{babel}
+\usepackage[labelsep=period]{caption}
+\usepackage[margin=4cm]{geometry}
+\usepackage{graphicx}
+\usepackage[utf8]{inputenc}
+\usepackage{listings}
+\usepackage{float}
+\usepackage{xcolor}
+\usepackage{subfigure}
+
+\frenchspacing
+\DisableLigatures[f]{}
+\parindent=20pt
+
+\definecolor{medgreen}{rgb}{0.0, 0.6, 0.0}
+\definecolor{reddishmauve}{rgb}{0.6, 0.0, 0.3}
+\lstset{language=Python, showstringspaces=false, numberfirstline=false, breaklines=true, numbers=left, stepnumber=1, tabsize=4,
+basicstyle=\ttfamily, numberstyle=\tiny, commentstyle=\color{medgreen}\rmfamily, stringstyle=\color{reddishmauve}, keywordstyle=\color{blue}}
+
+\DeclareMathOperator*{\argmin}{arg\,min}
+
+\author{Ahmad Jamalzada \& Joseph Salaris}
+\title{\textsc{\Huge Computational Physics}\\Monte Carlo Ising Model}
+
+\begin{document}
+\maketitle
+\begin{abstract}
+jhkjh
+\end{abstract}
+
+\newpage
+
+\section{Introduction}
+The Ising model is known as the simplest model for ferromagnetism. It consists of an ensemble of discrete variables that  can be in one of two states ($+1$ or $-1$), which represent spin polarisation. These spins are usually arranged in a lattice where each spin is only subject to the interaction with its nearest neighbours. For such a system the Hamiltonian is given by: 
+\begin{align}\label{H}
+H=-J\sum_{\langle i,j\rangle}s_is_j-B_{ext}\sum_is_i
+\end{align}  
+where $J>0$ is the coupling constant, $\langle i,j\rangle$ denotes the sum over nearest neighbours of spin $s_i$ and $ B_{ext}$ is an external magnetic field. From the coupling term one sees that it is energetically favourable for the spins to be alligned with their nearest neighbours, hence the groundstate consists of the configuration where the whole lattice has the same spin polarisation resulting in maximal net magnetisation. However the system exhibits a phase transition as a function of temperature, as higher temperature raises the probability for the spins to be in the opposite state w.r.t. their nearest neighbours resulting in zero magnetisation. 
+
+Though exactly solvable (if $B_{ext}=0$) \cite{exact}, the Ising model serves as a very suitable model for simulation. As it is not a dynamical system one can use Monte Carlo (MC) methods to determine static physical quantities. We have implemented the MC Metropolis and the Wolf algorithm to simulate a two dimensional square lattice Ising model and study statistical averages such as magnetisation, energy and specifc heat as a function of temperature.
+
+\section{Methods}
+Simulating the Ising model we want to compute statistical averages $\langle A\rangle$ given by:
+\begin{align}
+\langle A\rangle=\frac{1}{Z}\sum_{i}{A(x_i)e^{-\frac{1}{k_BT}H}}
+\end{align}
+where $x_i$ is a given state of the system, $H$ is the hamiltonian (see (\ref{H})), $T$ is the temperature, $k_B$ the Boltzmann constant and $Z$ is the partition function. In general straightforward calculation by summing over all possible states would be very inefficient and yield unreasonable computation time. A widely used method to simulate these kind of systems is  the Monte Carlo (MC) method. MC method actually stands for a class of algorithms which exhibit random sampling. We have implemented the MC Metropolis algorithm which generates a Markov chain of states (configurations) according to a sampling distribution, which in our case is the Boltzmann distribution: $e^{-\beta H}$, where $\beta=\frac{1}{k_BT}$. 
+
+The Metropolis algorithm is implemented by first creating a lattice of spins of size $L\times L$ in a given state $x_i$. Then a trial state $x'$ is proposed with a trial step probability of $W_{x_ix'}=\frac{1}{L^2}$ by flipping a randomly selected spin. If the change in energy $\Delta E>0$, the trial state is accepted ($x_{i+1}=x'$) with a temperature dependent probability given by the Boltzmann factor $e^{-\beta\Delta E}$. If $\Delta E<0$, hence if the trial state is energetically favourable the trial state is always accepted ($x_{i+1}=x'$). We express the time in Monte Carlo steps per spin (MCS) being equal to $L^2$ trials. As the Markov chain is ergodic we can compute ensemble averages by calculating the 'time' average:
+\begin{align}
+\langle A\rangle = \frac{1}{N}\sum_i A_i
+\end{align}
+where the sum is over MCS. 
+
+
+
+\section{Results}
+
+
+%\newpage
+\section{Conclusion}
+
+
+
+\begin{thebibliography}{x}
+\bibitem{exact}
+ Lars Onsager, Crystal Statistics. I. A Two-Dimensional Model with an Order-Disorder Transition, Phys. Rev. 65, 117 
+\end{thebibliography}
+
+
+\end{document}

@@ -1,0 +1,285 @@
+//Lex van Heijningen en Ahmad Jamalzada
+//heijningenjamalzada.cc
+//Dit programma controleert of iemand geschikt is voor een universitaire studie.
+//Codeblocks, gedit, g++ en een standaard Windows compiler zijn gebruikt.
+//20.09.2013
+
+#include <iostream>
+#include <cstdlib>
+#include <ctime>
+
+using namespace std;
+
+const int jaarnu = 2013;
+const int maandnu = 9;
+const int dagnu = 20;
+
+int main()
+{
+    int YearOfBirth;
+    int MonthOfBirth;
+    int DayOfBirth;
+    int x;//random number xxx
+    int y;//random number yyy
+    int z;//random number zz
+    int q;//random number qq
+    int day_getal;
+    double answer;
+    double answer1;
+    double answer2;
+    double answer3;
+    char day;
+    char antwoordlit;
+    srand (time(NULL));
+
+    cout<<"Wij zijn Lex en Ahmad, we zijn eerste-jaars natuurkunde studenten\n"
+          "en wij zullen testen of u geschikt bent voor een universitaire\n" 
+          "studie. Dit programma is gemaakt voor het vak Programmeermethoden.\n"
+        << endl;
+    
+    cout<< " Voer geboortejaar in, in de vorm JJJJ " << endl;
+    cin>> YearOfBirth;
+    if(YearOfBirth > jaarnu - 10 || YearOfBirth < jaarnu - 101){
+        cout<< "leeftijd voldoet niet!\n";
+        return 1;
+    }
+
+    cout<< " Voer geboortemaand in, in de vorm MM " << endl;
+    cin>> MonthOfBirth;
+    
+    if(YearOfBirth >= jaarnu - 10 && MonthOfBirth > maandnu || 
+    	 (YearOfBirth == jaarnu - 101 && MonthOfBirth < maandnu)){
+        cout<< "leeftijd voldoet niet!";
+    }
+    if(MonthOfBirth < 1 || MonthOfBirth > 12){
+        cout<< "onmogelijk,maand te groot of te klein!!!"<< endl;
+        return 1;
+    }
+
+    cout<< " Voer geboortedag in, in de vorm DD " << endl;
+    cin>> DayOfBirth;
+    if(YearOfBirth == jaarnu - 10 && MonthOfBirth >= maandnu && DayOfBirth > 20 
+       || YearOfBirth == jaarnu - 101 && MonthOfBirth == maandnu 
+       && DayOfBirth < 21){
+        cout<< "leeftijd voldoet niet!\n";
+        return 1;
+    }
+
+    //dagen/maanden/jaren kunnen niet negatief zijn
+
+    if(DayOfBirth < 0 || DayOfBirth > 31){
+        cout<< "onmogelijk,dag te groot of te klein!!!" << endl;
+        return 1;
+    }
+
+    //maanden die niet meer dan 30 dagen kunnen hebben
+
+    if((MonthOfBirth == 4 || MonthOfBirth == 6 || MonthOfBirth == 9
+         || MonthOfBirth == 11) && DayOfBirth > 30){
+        cout<< " onmogelijk, 31??? " << endl;
+        return 1;
+    }
+
+    //Februari kan niet meer dan 28 of 29 dagen hebben
+
+    if((YearOfBirth) % 4 == 0 && MonthOfBirth == 2 && DayOfBirth > 29){
+        cout<< "Onmogelijk > 29???" << endl;
+        return 1;}
+
+    if(YearOfBirth % 4 != 0 && MonthOfBirth == 2 && DayOfBirth > 28){
+        cout<< "onmogelijk > 28" << endl;
+        return 1;
+    }
+
+    //Leeftijd berekenen
+
+    //wel jarig geweest
+
+    if((DayOfBirth <= dagnu  && MonthOfBirth <= maandnu) ||
+        (MonthOfBirth < maandnu )){
+        cout<< jaarnu - YearOfBirth << " jaar, ";
+    }
+
+    if(MonthOfBirth == maandnu && DayOfBirth > dagnu){
+             cout<< jaarnu - YearOfBirth - 1 << " jaar " ;
+    }
+
+    if(MonthOfBirth == maandnu && DayOfBirth > dagnu){
+        cout<< 12 << " maanden " ;
+    }
+
+    if(MonthOfBirth == 1){
+             cout << 9 << "maanden ;" ;
+    }
+
+    if(MonthOfBirth < maandnu && MonthOfBirth > 1){
+             cout<< maandnu - MonthOfBirth << " maand(en); ";
+    }
+
+    if(MonthOfBirth == maandnu && DayOfBirth < dagnu){
+             cout<< 0 << " maanden ;" ;
+    }
+
+    if(MonthOfBirth == maandnu){
+        cout<< (jaarnu - YearOfBirth) * 12 << " maanden totaal\n";
+    }
+
+    if(MonthOfBirth < maandnu){
+             cout<< (jaarnu - YearOfBirth) * 12 + 10 - MonthOfBirth 
+                 << "maanden totaal\n";
+    }
+
+	 //niet jarig geweest
+
+
+    if(MonthOfBirth > maandnu){
+        cout<< (jaarnu - 1 - YearOfBirth) << " jaar ";
+    }
+
+    if(MonthOfBirth >= 10){
+        cout<< 13 - (12 - MonthOfBirth)  << " maand(en); " ;
+    }
+
+    if(MonthOfBirth > maandnu){
+        cout<< (jaarnu - YearOfBirth) * 12 - (12 - MonthOfBirth + 1) 
+            << " maanden totaal "
+            << endl;
+    }
+
+    //controleren van dag waarop gebruiker geboren is.
+
+    cout<< "Voer de dag waarop u geboren bent in waarbij"
+    ":\n m=maandag\n d=dinsdag \n w=woendag\n D=donderdag"
+    " \n v=vrijdag \n z=zaterdag \n Z=zondag\n (let op hoofdletter gevoelig!)" 
+        << endl;
+
+    cin>> day;  //dag wordt ingevoerd
+
+    if(day == 'm')
+        day_getal = 0;
+    else if(day == 'd')
+        day_getal = 1;
+    else if(day == 'w')
+        day_getal = 2;
+    else if(day == 'D')
+        day_getal = 3;
+    else if(day == 'v')
+        day_getal = 4;
+    else if(day == 'z')
+        day_getal = 5;
+    else if(day == 'Z')
+        day_getal = 6;
+
+    //rekensom om te bepalen welke dag iemand geboren is.
+
+    int antwoord = (YearOfBirth - 1901) * 365 + (YearOfBirth -1901) / 4 
+    					 + DayOfBirth;
+    					 
+    //indien het jaar geen schrikkeljaar is bovenstaande forumele
+    
+    if(YearOfBirth % 4 == 0 && MonthOfBirth >= 3 ){
+        antwoord = antwoord + 1;  
+    }//indien het jaar een schrikkeljaar is antwoord+1   
+
+    else if(MonthOfBirth == 2){
+             antwoord += 31;
+    }
+    
+    else if(MonthOfBirth == 3){
+             antwoord += 59;
+    }
+    
+    else if(MonthOfBirth == 4){
+             antwoord += 90;
+    }
+    
+    else if(MonthOfBirth == 5){
+             antwoord += 120;
+    }
+    
+    else if(MonthOfBirth == 6){
+             antwoord += 151;
+    }
+    
+    else if(MonthOfBirth == 7){
+             antwoord += 181;
+    }
+    
+    else if(MonthOfBirth == 8){
+             antwoord += 212;
+    }
+
+    else if(MonthOfBirth == 9){
+             antwoord += 243;
+    }
+
+    else if(MonthOfBirth == 10){
+             antwoord += 273;
+    }
+    
+    else if(MonthOfBirth == 11){
+             antwoord += 303;
+    }
+
+    else if(MonthOfBirth == 12){
+             antwoord += 334;
+    }
+
+    if(antwoord % 7 != day_getal) {
+        cout<< "ongeschikt" << endl;
+        return 1;
+    }
+
+
+    //rekensom
+    cout<< "Nu zullen we uw rekenvaardigheid testen\n" << endl;
+
+    x = rand () % 500 + 100;
+    y = rand () % 300 + 101;
+    z = rand () % 51;
+    q = rand () % 51;
+
+    double r = x + z / 100.0;
+    double s = y + q / 100.0;
+
+    cout<< r << "+" << s << "=";
+
+    cin>> answer;
+          answer1 = r + s;
+          answer2 = (r + s) + .01;//foutmarge + 0.01
+     		 answer3 = (r + s) - .01;//foutmarge - 0.01
+
+
+    if(answer == answer1 || answer == answer2 || answer == answer3 ){
+     cout<< "U bent geschikt voor een betastudie, gefeliciteerd" << endl;
+     return 1;
+    }
+
+    else 
+       cout<< "Helaas, u bent niet geschikt voor een betastudie,\n"
+              "indien u de volgende multiplechoicevraag correct beantwoordt\n"
+              "bent u wel toegelaten tot een alfastudie.Als u deze vraag \n"
+              "incorrect beantwoordt dan bent u ongeschikt voor\n"
+              "een universitaire studie.\n" << endl;
+
+    	 cout<< "In de naoorlogse nederlandse literatuur worden drie schrijvers\n"
+  			     "beschouwd als 'De Grote Drie'.\n" 
+  			     "Welke schrijver behoord officieel niet tot De Grote Drie?\n"
+              "A: Gerard Reve\n"
+              "B: Jan Wolkers\n"
+              "C: Harry Mulisch\n"
+              "D: Willem Frederik Hermans\n" << endl;
+    
+    cin>> antwoordlit;
+
+    if (antwoordlit == 'B' || antwoordlit == 'b'){
+         cout<< "Gefeliciteerd, u bent geschikt voor een alphastudie" << endl;
+    }
+    else
+       cout<< "Helaas, u bent niet geschikt voor een universitaire studie"
+           <<endl;
+       return 1;
+
+
+    return 0;
+}

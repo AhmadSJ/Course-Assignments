@@ -1,0 +1,630 @@
+//Deze code is geschreven door Ahmad Jamalzada (1145657)
+//De naam van het bestand is jamalzada3.cc
+//Dit programma maakt een nonogram op basis van de door een gebruiker gewenste
+//parameters. De gebruiker kan ook een nonogram proberen op te lossen.
+//Compiler mingw32-g++ en g++(GCC 4.8.1) zijn gebruikt om het bestand te testen.
+//Code Blocks en gedit zijn gebruikt om het bestand te editen.
+//Dit programma is afgrond op 15 november 2013.
+
+#include <iostream>
+#include <cstdlib>
+#include <fstream>
+#include <string>
+
+using namespace std;
+
+const int MAX = 50;
+//Een functie die ingevoerde getallen van de gebruiker verwerkt.
+int leesgetal (int bovengrens){
+	char numb = cin.get();
+	int getal = 0;
+
+	while (numb == '\n')
+		numb = cin.get();
+
+	while (numb != '\n'){
+		if (numb <= '9' && numb >= '0'){
+			getal = 10 * getal + (numb - '0');
+			if (getal > bovengrens)
+				getal = getal / 10;
+		}
+		numb = cin.get();
+		}
+	return getal;
+}
+//Verwerkt ingevoerde enters
+char inlezen(){
+	char kar = cin.get();
+
+	while (kar == '\n')
+		kar = cin.get();
+
+	return kar;
+}
+
+class nonogram{
+	private:
+		bool beeld[MAX][MAX];
+		bool zwart;
+		bool wit;
+		int beschrijfRechts[MAX][MAX];
+		int beschrijfOnder[MAX][MAX];
+		int hoogte;
+		int breedte;
+		int percentage;
+		int iCursor;
+		int jCursor;
+
+	public:
+		nonogram();
+		int randomgetal();
+		int setpercentage();
+		int setheight();
+		int setbreedte();
+		int rijBesGoed(int z);
+		int kolomBesGoed(int x);
+		void randomvullen();
+		void schoon();
+		void schoonBeschrijf();
+		void BRechts();
+		void BOnder();
+		void drukaf();
+		void drukOnder();
+		void inlezenBeschr();
+		void wegschrijvenBeschr();
+		void wegschrijvenBeeld();
+		void Cursor(char invoer);
+		void zwartwitneutraal(char invoering);
+		void toggel();
+		void oplossen();
+};
+
+nonogram::nonogram(){
+	hoogte = 10;
+	breedte = 10;
+	percentage = 70;
+	iCursor = hoogte / 2;
+	jCursor = breedte / 2;
+	zwart = false;
+	wit = false;
+}
+//Creeërt een pseudo-random getal.
+int nonogram::randomgetal(){
+	static int randgetal = 42;
+	randgetal = ( 221 * randgetal + 1 ) % 1000;
+
+	return randgetal;
+}
+//Wijzigt het percentage random aan door de gebruiker ingevoerde percentage.
+//Als de gebruiker het beeld leeg wilt hebben moet hij de schoon functie
+//aanroepen!
+int nonogram::setpercentage(){
+	percentage = leesgetal(100);
+	while (percentage == 0){
+		cout << "Wat is uw gewenste percentage?" << endl;
+      percentage = leesgetal(100);
+   }
+
+	return percentage;
+}
+//Past hoogte van het nonogram aan door de gebruiker ingevoerde hoogte.
+int nonogram::setheight(){
+	hoogte = leesgetal(MAX);
+	while (hoogte == 0){
+		cout << "Wat is uw gewenste hoogte?" << endl;
+      hoogte = leesgetal(MAX);
+   }
+
+    iCursor = hoogte / 2;
+
+	return hoogte;
+}
+//Past breedte van het nonogram aan door de gebruiker ingevoerde breedte.
+int nonogram::setbreedte(){
+    breedte = leesgetal(MAX);
+    while (breedte == 0){
+        cout << "Wat is uw gewenste breedte?" << endl;
+        breedte = leesgetal(MAX);
+    }
+    jCursor = breedte / 2;
+
+	return breedte;
+}
+//Controleert of de rijbeschrijvingen kloppen aan het beeld.
+int nonogram::rijBesGoed(int z)
+{
+	int l = 0;
+	int teller = 0;
+	bool goedRechts = true;
+	for (int j = 0; j < breedte; j++)
+	{
+		if (beeld[z][j] == true)
+			teller++;
+		else if (teller != 0)
+		{
+			if (teller == beschrijfRechts[z][l])
+			{
+				goedRechts = true;
+				teller = 0;
+				l++;
+			}
+			else
+				goedRechts = false;
+		}
+	}
+	if (goedRechts == true && teller == beschrijfRechts[z][l])
+      goedRechts = true;
+   else
+   	goedRechts = false;
+
+   if (goedRechts == true)
+		return true;
+	else
+		return false;
+}
+//Controleert of de kolombeschrijvingen kloppen aan het beeld (wordt aangeroepen
+//in drukOnder()
+int nonogram::kolomBesGoed(int x){
+	int l = 0;
+	int teller = 0;
+	bool goedOnder = true;
+	for (int i = 0; i < hoogte; i++){
+		if (beeld[i][x] == true)
+			teller++;
+		else if (teller != 0){
+			if (teller == beschrijfOnder[l][x]){
+				goedOnder = true;
+				teller = 0;
+				l++;
+			}
+			else
+				goedOnder = false;
+		}
+	}
+	if (goedOnder == true && teller == beschrijfOnder[l][x])
+      goedOnder = true;
+   else
+   	goedOnder = false;
+
+   if (goedOnder == true)
+		return true;
+	else
+		return false;
+}
+//Vult de nonogram tot een bepaalde percentage willekeurig.
+void nonogram::randomvullen(){
+	for (int i = 0; i < hoogte; i++){
+		for (int j = 0; j < breedte; j++){
+			if (randomgetal() % 101 < percentage)
+				beeld[i][j] = true;
+			else
+				beeld[i][j] = false;
+		}
+	}
+}
+//Maakt het beeld leeg.
+void nonogram::schoon(){
+	for (int i = 0; i < MAX; i++){
+		for (int j = 0; j < MAX; j++){
+			beeld[i][j] = false;
+		}
+	}
+}
+//Maakt de rij- en kolombeschrijven nul.
+void nonogram::schoonBeschrijf(){
+	for (int i = 0; i < MAX; i++){
+		for (int j = 0; j < MAX; j++){
+			beschrijfRechts[i][j] = 0;
+			beschrijfOnder[i][j] = 0;
+		}
+	}
+}
+//Maakt de rij beschrijvingen kloppend met het beeld (maar drukt het niet af!)
+void nonogram::BRechts(){
+	for (int i = 0; i < hoogte; i++){
+		int teller2 = 0;
+		int teller = 0;
+		int k = 0;
+		for (int j = 0; j < breedte; j++){
+
+         if (beeld[i][j] == false)
+         	teller2++;
+
+			if (beeld[i][j] == true)
+				teller++;
+
+			else if (teller > 0){
+				beschrijfRechts[i][k] = teller;
+				teller = 0;
+				k++;
+			}
+		} // for
+
+      if (teller2 == breedte){
+          beschrijfRechts[i][k] = 999;
+          k++;
+		}
+		beschrijfRechts[i][k] = teller;
+		teller = 0;
+
+		teller2 = 0;
+		k = 0;
+	} // for
+}
+//Maakt de kolombeschrijvingen kloppend met het beeld (maar drukt het niet af!)
+void nonogram::BOnder(){
+	for (int j = 0; j < breedte; j++){
+   	int teller2 = 0;
+    	int teller = 0;
+    	int k = 0;
+    	for (int i = 0; i < hoogte; i++){
+      	if (beeld[i][j] == false)
+         	teller2++;
+      	if (beeld[i][j] == true)
+         	teller++;
+      	else if (teller > 0){
+         	beschrijfOnder[k][j] = teller;
+            teller = 0;
+            k++;
+         }
+      }
+      if (teller2 == hoogte){
+          beschrijfOnder[k][j] = 900; //arbitrair groot getal wordt in de kolom
+          k++;								  //gestopt als de rij leeg iszodat
+      }										  //gecontroleert kan worden bij het
+      teller2 = 0;						  //afdrukken of de kolom leeg is.
+
+      beschrijfOnder[k][j] = teller;
+      teller = 0;
+      k = 0;
+    }
+}
+//Drukt het nonogram af.
+//Drukt de rijbeschrijvingen en kolombeschrijvingen af (als die niet nul zijn)
+//Controle van rijbeschrijvingen en kolombeschrijvingen met beeld wordt hier
+//aangeroepen. Controleert of rij-en en kolommen nul zijn, zodat een nul wordt
+//afgedrukt als de rij of kolommen nul zijn.
+void nonogram::drukaf(){
+	int i = 0;
+	for (i = 0; i < hoogte; i++){
+		for (int j = 0; j < breedte; j++){
+			if ( i == iCursor && j == jCursor)
+				cout << '*' << " ";
+			else if (beeld[i][j] == true){
+				cout << "X" << " ";
+			}
+			else
+				cout << " " << " ";
+      } //for
+      cout << "|";
+
+      if (rijBesGoed(i) == true)
+      	cout << "V";
+      else
+      	cout << " ";
+
+		int k = 0;
+      while (beschrijfRechts[i][k] > 0){ 			//hier wordt de rijbeschrijving
+      	if (beschrijfRechts[i][k] == 999){		//afgedrukt
+         	cout << "0";
+            k++;
+         }
+         else {
+         	cout << beschrijfRechts[i][k] << " ";
+         	k++;
+           }
+        } //while
+      k = 0;
+
+		cout << endl;
+	} //for
+	for (int i = 0; i < breedte; i++)
+        cout << "_" << " ";
+
+   cout << endl;
+   drukOnder();
+}
+//Drukt de kolombeschrijvingen af, deze functie wordt aangeroepen in drukaf()
+void nonogram::drukOnder(){
+	int minimum = 999; // arbitrair groot getal
+	char tienplus = 'z';
+
+	for (int j = 0; j < breedte; j++){	//Controleert kolommen met beschrijvingen
+		if (kolomBesGoed(j) == true)
+			cout << "V ";
+		else
+			cout << "  ";
+	}
+	cout << endl;
+
+	for (int j = 0; j < breedte; j++){ //verwerkt overbodige enters in kolombesch
+		int aantalNullen = 0;
+		for (int i = 0; i < hoogte; i++){
+
+            if (beschrijfOnder[i][j] == 0){
+                aantalNullen++;
+            }
+		}
+		if (aantalNullen < minimum) {
+			minimum = aantalNullen;
+		}
+	} //for
+
+	for (int i = 0; i < hoogte - minimum; i++){
+		for (int j = 0; j < breedte; j++){
+      	if (beschrijfOnder[i][j] > 0){
+         	if (beschrijfOnder[i][j] > 9){
+            	if (beschrijfOnder[i][j] == 900) //geeft nul als kolom leeg
+               	cout << "0" << " ";
+               else {
+               	tienplus = beschrijfOnder[i][j] - 10 + 'A';
+                  cout << tienplus << " ";
+               }
+            }//if
+            else
+            	cout << beschrijfOnder[i][j] << " ";
+         }//if
+			else
+         	cout << "  ";
+		}//for
+      cout << endl;
+	}//for
+}
+//Past de beschrijvingen aan de beschrijvingen van een ingelezen file.
+void nonogram::inlezenBeschr(){
+	ifstream invoer;
+	string fileNaam;
+	int i = 0;
+	int j = 0;
+	int getal = 1;
+
+	cout << "Voer de filenaam in dat u wilt inlezen" << endl;
+	cin >> fileNaam;
+	invoer.open (fileNaam.c_str());
+
+	if (invoer.fail()){
+		cout << "Openen van " << fileNaam << " is niet gelukt." << endl;
+		return;
+	}
+
+	invoer >> hoogte >> breedte;
+
+	for (i = 0; i < hoogte; i++){
+		j = 0;
+		invoer >> getal;
+		while (getal > 0){
+			beschrijfRechts[i][j] = getal;
+			invoer >> getal;
+			j++;
+		}
+	}
+	j = 0;
+	i = 0;
+	for (j = 0; j < breedte; j++){
+		i = 0;
+		invoer >> getal;
+		while (getal > 0){
+			beschrijfOnder[i][j] = getal;
+			invoer >> getal;
+			i++;
+		}
+	}
+	iCursor = hoogte / 2;
+	jCursor = breedte / 2;
+} //inlezenBeschr
+//Schrijft de beschrijvingen naar een file.
+void nonogram::wegschrijvenBeschr(){
+	ofstream uitvoer;
+	uitvoer.open ("beschrijf.txt", ios::out);
+
+	uitvoer << hoogte << " " << breedte << endl;
+
+	for (int i = 0; i < hoogte; i++){
+		for (int j = 0; j < breedte; j++){
+			if (beschrijfRechts[i][j] > 0 && beschrijfRechts[i][j] != 999)
+				uitvoer << beschrijfRechts[i][j] << " ";
+		}
+		uitvoer << "0" << endl;
+	}
+
+	for (int j = 0; j < breedte; j++){
+		for (int i = 0; i < hoogte; i++){
+			if (beschrijfOnder[i][j] > 0 && beschrijfOnder[i][j] != 900)
+				uitvoer << beschrijfOnder[i][j] << " ";
+			}
+		uitvoer << "0" << endl;
+	}
+}
+//Schrijft het beeld naar een file
+void nonogram::wegschrijvenBeeld(){
+	ofstream uitvoer;
+	uitvoer.open ("beeldnono.txt", ios::out);
+
+	uitvoer << hoogte << " " << breedte << endl;
+
+	for (int i = 0; i < hoogte; i++){
+		for (int j = 0; j < breedte; j++)
+			uitvoer << beeld[i][j];
+		uitvoer << endl;
+	}
+}
+//De cursor wordt hiermee door het beeld bewogen door de gebruiker.
+void nonogram::Cursor(char invoer){
+	switch (invoer){
+		case 'a':
+			if (jCursor != 0)
+				jCursor = jCursor - 1;
+			break;
+		case 's':
+			if (iCursor != hoogte -1)
+				iCursor = iCursor + 1;
+			break;
+		case 'd':
+			if (jCursor != breedte - 1)
+				jCursor = jCursor + 1;
+			break;
+		case 'w':
+			if (iCursor != 0)
+				iCursor = iCursor - 1;
+			break;
+		}
+
+	if (zwart == true)
+		beeld[iCursor][jCursor] = true;
+	else if (wit == true)
+		beeld[iCursor][jCursor] = false;
+}
+//Maakt van de cursor een brush als de gebruiker dat kiest.
+void nonogram::zwartwitneutraal(char invoering){
+	switch (invoering){
+		case 'Z': case 'z':
+			zwart = true;
+			break;
+		case 'W': case 'w':
+			wit = true;
+			zwart = false;
+			break;
+		case 'N': case 'n':
+			zwart = false;
+			wit = false;
+			break;
+	}
+}
+//Toggelt het beeld op de huidige positie van de cursor.
+void nonogram::toggel(){
+	if (beeld[iCursor][jCursor])
+		beeld[iCursor][jCursor] = false;
+	else
+		beeld[iCursor][jCursor] = true;
+}
+//De lijnen waarvan de beschrijving evenveel als hoogte/breedte is
+//worden zwart gemaakt.
+void nonogram::oplossen(){
+	for (int i = 0; i < hoogte; i++){
+	   for (int j = 0; j < breedte; j++){
+      	if (beschrijfRechts[i][j] == breedte){
+         	for (int l = 0; l < breedte; l++)
+            	beeld[i][l] = true;
+         }
+      }
+   }
+
+	for (int j = 0; j < breedte; j++){
+		for (int i = 0; i < hoogte; i++){
+	      if (beschrijfOnder[j][i] == hoogte){
+	        	for (int l = 0; l < hoogte; l++)
+	           	beeld[l][i] = true;
+         }
+      }
+   }
+}
+//De gebruiker kan kiezen om parameters van het beeld te veranderen.
+void submenu(nonogram & nono){
+	char kar = '@';
+
+	while (kar != 't' && kar != 'T') {
+		nono.drukaf();
+		cout << "(B)reedte, (H)oogte, (P)ercentage random"
+		     << ", (T) om terug te gaan, Bij het verplaatsen"
+		     << " van cursor: nieuwe punt (Z)wart, "
+		     << "(W)it of O(n)verandert" << endl;
+
+		kar = inlezen();
+
+		switch (kar) {
+			case 'H': case 'h':
+				cout << "Voer uw gewenste hoogte in.\n" << endl;
+				nono.setheight();
+				cout << endl;
+				break;
+			case 'B': case 'b':
+				cout << "Voer uw gewenste breedte in.\n" << endl;
+				nono.setbreedte();
+				break;
+			case 'P': case 'p':
+				cout << "Voer een percentage in [max 100, min 1].\n" << endl;
+				nono.setpercentage();
+				break;
+			case 'Z': case 'z': case 'W': case 'w': case 'n': case 'N':
+				nono.zwartwitneutraal(kar);
+				break;
+		}//switch
+	} //while
+} //submenu
+
+void menu(nonogram & nono){
+   char kar = '@';
+   nono.schoon();
+   nono.schoonBeschrijf();
+
+   while (kar != 'o' && kar != 'O'){
+		nono.drukaf();
+		cout << "Nonogram s(C)hoon, (R)andom vullen, (P)arameters, St(o)ppen\n"
+			  << "Cursor naar: Links = a, Rechts = d, Beneden = s, Boven = w\n"
+			  << "Geef B(e)schrijvingen huidig beeld, Beschrijvingen (N)ul zetten,"
+			  << " Beschrijvingen we(g)schrijven, Beschrijvingen (i)nlezen, "
+			  << "Bee(l)d wegschrijven, Ele(m)entair oplossen"
+			  << endl;
+
+		kar = inlezen();
+
+    	switch (kar){
+    		case 'm': case 'M':
+    			nono.oplossen();
+    			break;
+    		case 'l': case 'L':
+    			nono.wegschrijvenBeeld();
+    			break;
+    		case 'i':
+    			nono.schoonBeschrijf();
+    			nono.inlezenBeschr();
+    			break;
+    		case 'g':
+    			nono.wegschrijvenBeschr();
+    			break;
+    		case 'E': case 'e':
+    		    nono.schoonBeschrijf();
+             nono.BOnder();
+             nono.BRechts();
+    			break;
+    		case 'C': case 'c':
+    			cout << "De array is geschoond.\n" << endl;
+    			nono.schoon();
+    			break;
+         case 'N': case 'n':
+             nono.schoonBeschrijf();
+    			break;
+    		case 'R': case 'r':
+    			nono.randomvullen();
+    			break;
+    		case 'P': case 'p':
+    			submenu(nono);
+    			break;
+    		case 'O': case 'o':
+    			cout << "Afsluiten programma.\n" << endl;
+    			break;
+    		case 'w': case 'a': case 's': case 'd':
+    			nono.Cursor(kar);
+    			break;
+    		case 't':
+    			nono.toggel();
+    			break;
+      } //switch
+   } //while
+} //menu
+
+int main (){
+
+	nonogram nono;
+	menu(nono);
+
+   return 0;
+}
+
+
+
+
+
+
+
+

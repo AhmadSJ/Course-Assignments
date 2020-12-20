@@ -1,0 +1,6 @@
+# depslib dependency file v1.0
+1379536641 source:c:\documents and settings\hp_administrator\mijn documenten\rekenvraag\main.cpp
+	<iostream>
+	<cstdlib>
+	<cmath>
+

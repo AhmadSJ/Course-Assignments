@@ -1,0 +1,23 @@
+# depslib dependency file v1.0
+1386503982 source:c:\users\gebruiker\documents\programmeermethoden\opdracht4\jamalzadadevoshoofd4.cc
+	<iostream>
+	"JamalzadaDeVosgobord4.h"
+
+1386503982 c:\users\gebruiker\documents\programmeermethoden\opdracht4\jamalzadadevosgobord4.h
+	"JamalzadaDeVosstapel4.h"
+
+1386340974 c:\users\gebruiker\documents\programmeermethoden\opdracht4\jamalzadadevosstapel4.h
+	"JamalzadaDeVosbordvakje4.h"
+
+1386340974 c:\users\gebruiker\documents\programmeermethoden\opdracht4\jamalzadadevosbordvakje4.h
+
+1386340974 source:c:\users\gebruiker\documents\programmeermethoden\opdracht4\jamalzadadevosstapel4.cc
+	<iostream>
+	"JamalzadaDeVosstapel4.h"
+
+1386525808 source:c:\users\gebruiker\documents\programmeermethoden\opdracht4\jamalzadadevosgobord4.cc
+	<iostream>
+	<cstdlib>
+	<ctime>
+	"JamalzadaDeVosgobord4.h"
+

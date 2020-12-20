@@ -1,0 +1,39 @@
+#include <iostream>
+
+using namespace std;
+
+int main()
+{
+	int jaar;
+	int maand;
+	int dag;
+
+	cout << "Voer je geboortejaar in" << endl;
+
+	cin >> jaar;
+
+	if ((jaar < 1912) || (jaar > 2003))
+		cout << "Je bent niet geschikt" << endl;
+    else
+        cout << "Voer je geboortemaand in" << endl;
+
+    cin >> maand;
+    if ((jaar != 2003 ) || (jaar != 1912))
+        cout << "Voer je geboortedag in" << endl;
+    else if ( ((jaar == 2003) && (maand > 9)) || (jaar == 1912 && maand < 9))
+		cout << "Je bent niet geschikt" << endl;
+
+
+	cin >> dag;
+
+	if ( jaar == 2003 && maand == 9 && dag < 20)
+		cout << "Geschikt";
+
+	if (jaar == 2003 && maand == 9 && dag > 20)
+
+	    cout << "Te jong";
+
+
+
+	return 0;
+}
